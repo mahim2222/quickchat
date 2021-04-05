@@ -34,7 +34,7 @@ const auth_id=localStorage.getItem('auth-id');
 formData.append('image',e.target.files[0]);
 formData.append('my_id',auth_id);
 
-const pic_changed=await AxiosConfig.post('/profile/updatepic',formData);
+const pic_changed=await AxiosConfig.post('/profile/updatepic',formData,{headers:{'x-auth-token':auth_token}});
 setMypic(pic_changed.data);
 
 }
