@@ -1,10 +1,11 @@
 import {useEffect,useContext,useState} from 'react';
-import pic from '../images/pic/pic1.jpg';
 import {BiArrowBack} from 'react-icons/bi';
 import {FaPhone} from 'react-icons/fa';
 import {BiDotsVerticalRounded} from 'react-icons/bi';
 import {useHistory,useParams} from 'react-router-dom';
+import AxiosConfig from '../helpers/axiosconfig';
 import SocketContext from '../context/socketcontext';
+import baseURL from '../helpers/baseurl';
 
 const Chat=()=>{
 
@@ -12,6 +13,7 @@ const {reciever_id}=useParams();
 const history=useHistory();
 const {mysocket}=useContext(SocketContext);
 
+const [recieverinfo,setRecieverInfo]=useState([]);
 const [Typing,setTyping]=useState('');
 
 useEffect(()=>{
@@ -29,20 +31,22 @@ mysocket.on('take_message',data=>{
 //message getting and displaying
 
 mysocket.on("get_message",async msg=>{
-   
-    const show_message=document.getElementById('show_message_area');
-	
-	//creating show message dom
-	const user_msg_wraper=document.createElement('div');
-	user_msg_wraper.classList.add('user_message_wraper');
-	const user_msg=document.createElement('div');
-	user_msg.classList.add('user_message');
+
+if(msg.sender===reciever_id){
+
+const show_message=document.getElementById('show_message_area');
+    
+    //creating show message dom
+    const user_msg_wraper=document.createElement('div');
+    user_msg_wraper.classList.add('user_message_wraper');
+    const user_msg=document.createElement('div');
+    user_msg.classList.add('user_message');
     //making text element
-	const user_msg_text=document.createElement('div');
-	user_msg_text.classList.add('user_message_text');
-	const p_text=document.createElement('p');
-	p_text.innerText=msg.message;
-	user_msg_text.append(p_text);
+    const user_msg_text=document.createElement('div');
+    user_msg_text.classList.add('user_message_text');
+    const p_text=document.createElement('p');
+    p_text.innerText=msg.message;
+    user_msg_text.append(p_text);
     //making time element
     const user_msg_time=document.createElement('div');
     user_msg_time.classList.add('user_message_time');
@@ -57,14 +61,29 @@ mysocket.on("get_message",async msg=>{
     show_message.append(user_msg_wraper);
 
 
-	show_message.scrollTop=show_message.scrollHeight;
+    show_message.scrollTop=show_message.scrollHeight;
 
-    })
+}    
+
+})
 
 
 }
 
-},[mysocket]);
+//getting reciever info
+
+async function get_reciever(){
+
+const token=localStorage.getItem('x-auth-token');
+const reciever_info=await AxiosConfig.post('/users/single_user',{user_id:reciever_id},{headers:{'x-auth-token':token}});
+setRecieverInfo(reciever_info.data);
+
+}
+
+get_reciever();
+
+
+},[mysocket,reciever_id]);
 
 //sending message
 
@@ -126,11 +145,14 @@ return(
 
 <div className="chat_area_nav">
 
+{
+recieverinfo.length!==0?
 <div className="chat_area_nav_user">
-<img src={pic} alt=""/> 
-<span>Mark Messer</span> 
+<img src={baseURL+'/'+recieverinfo.avatar} alt=""/> 
+<span>{recieverinfo.name}</span> 
 <div className="user_status_online"></div>
-</div>
+</div>:null    
+}
 
 <div className="chat_area_nav_icons">
 <ul>
