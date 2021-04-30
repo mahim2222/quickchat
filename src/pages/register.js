@@ -27,6 +27,7 @@ async function RegisterHandler(e){
   localStorage.setItem('x-auth-token',logged.data.token);
   localStorage.setItem('auth-id',logged.data.user.id);
   setCurrentUser(logged.data.user);
+  await AxiosConfig.post('/set_socket',{user_id:logged.data.user.id,socket:localStorage.getItem('socket-id')})
   history.push('/');
   }
 

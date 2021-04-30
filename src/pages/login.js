@@ -3,13 +3,11 @@ import Logo from '../images/logo.png';
 import {useContext,useState} from 'react';
 import {useHistory} from 'react-router-dom';
 import AuthContext from '../context/userContext';
-import SocketContext from '../context/socketcontext';
 import AxiosConfig from '../helpers/axiosconfig';
 
 const Login=()=>{
 const history=useHistory();
 const {setCurrentUser}=useContext(AuthContext);
-const {mysocket}=useContext(SocketContext);
 const [loading,setLoading]=useState(false);
 const [error,setError]=useState(false);
 const [username,setUsername]=useState('');
@@ -23,7 +21,7 @@ async function LoginHandler(e){
 	localStorage.setItem('x-auth-token',logged.data.token);
 	localStorage.setItem('auth-id',logged.data.user.id);
 	setCurrentUser(logged.data.user);
-	mysocket.emit('take_me',logged.data.user.id);
+	await AxiosConfig.post('/set_socket',{user_id:logged.data.user.id,socket:localStorage.getItem('socket-id')})
 	history.push('/');
 	}catch(err){
 	setError(err.response.data.message);

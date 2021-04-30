@@ -1,9 +1,11 @@
 import {Route,Redirect} from 'react-router-dom';
+import {useContext} from 'react';
+import AuthContext from '../context/userContext';
 
 
 const Private=({component:Component,...rest})=>{
 
-const currentUser=localStorage.getItem('x-auth-token');
+const {currentUser}=useContext(AuthContext);
 
 return(
 

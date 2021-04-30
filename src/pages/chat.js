@@ -1,140 +1,81 @@
-import {useEffect,useContext,useState} from 'react';
+import {useEffect,useState,useContext} from 'react';
 import {BiArrowBack} from 'react-icons/bi';
-import {FaPhone} from 'react-icons/fa';
-import {BiDotsVerticalRounded} from 'react-icons/bi';
+import {FaImage} from 'react-icons/fa';
+import {HiDotsVertical} from 'react-icons/hi';
+import {MdBlock} from 'react-icons/md';
 import {useHistory,useParams} from 'react-router-dom';
 import AxiosConfig from '../helpers/axiosconfig';
-import SocketContext from '../context/socketcontext';
+import AuthContext from '../context/userContext';
 import baseURL from '../helpers/baseurl';
 
 const Chat=()=>{
 
-const {reciever_id}=useParams();
 const history=useHistory();
-const {mysocket}=useContext(SocketContext);
-
-const [recieverinfo,setRecieverInfo]=useState([]);
-const [Typing,setTyping]=useState('');
+const [chatinfo,setChatinfo]=useState([]);
+const [loading,setLoading]=useState(true);
+const [online,setOnline]=useState(false);
+const [chataction,setChataction]=useState(false)
+const { reciever_id } = useParams();
+const {currentUser}=useContext(AuthContext);
 
 useEffect(()=>{
+localStorage.setItem('msg-reciever',reciever_id);
+//getting user info
+async function chat_info(){
+const token=localStorage.getItem('x-auth-token');	
+const response=await AxiosConfig.post('/users/single_user',{user_id:reciever_id},{headers:{'x-auth-token':token}})
+setChatinfo(response.data);
+setOnline(response.data.status)
+setLoading(false)
+}
+chat_info();
+
+let chat_status=setInterval(async ()=>{
+
+const status=await AxiosConfig.post('/users/user_status',{uid:reciever_id})
+setOnline(status.data)
+
+},10000)
 
 
-if(mysocket===null){
-console.log('no socket connection on chat.js')
-}else{
-
-mysocket.on('take_message',data=>{
-	console.log(data)
-})
 
 
-//message getting and displaying
+//cleanup useEffect
 
-mysocket.on("get_message",async msg=>{
-
-if(msg.sender===reciever_id){
-
-const show_message=document.getElementById('show_message_area');
-    
-    //creating show message dom
-    const user_msg_wraper=document.createElement('div');
-    user_msg_wraper.classList.add('user_message_wraper');
-    const user_msg=document.createElement('div');
-    user_msg.classList.add('user_message');
-    //making text element
-    const user_msg_text=document.createElement('div');
-    user_msg_text.classList.add('user_message_text');
-    const p_text=document.createElement('p');
-    p_text.innerText=msg.message;
-    user_msg_text.append(p_text);
-    //making time element
-    const user_msg_time=document.createElement('div');
-    user_msg_time.classList.add('user_message_time');
-    const span_time=document.createElement('span');
-    span_time.innerText=msg.time;
-    user_msg_time.append(span_time);
-
-    user_msg.append(user_msg_text);
-    user_msg.append(user_msg_time);
-    user_msg_wraper.append(user_msg);
-
-    show_message.append(user_msg_wraper);
-
-
-    show_message.scrollTop=show_message.scrollHeight;
-
-}    
-
-})
-
-
+return ()=>{
+clearInterval(chat_status);
+localStorage.setItem('msg-reciever',null);
 }
 
-//getting reciever info
-
-async function get_reciever(){
-
-const token=localStorage.getItem('x-auth-token');
-const reciever_info=await AxiosConfig.post('/users/single_user',{user_id:reciever_id},{headers:{'x-auth-token':token}});
-setRecieverInfo(reciever_info.data);
-
-}
-
-get_reciever();
-
-
-},[mysocket,reciever_id]);
+},[reciever_id]);
 
 //sending message
 
 async function send_message(e){
 
-if(e.key==='Enter'){
-	var myDate = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
-    const auth_id=localStorage.getItem('auth-id');
-	const new_message={sender:auth_id,message:Typing,time:myDate,reciever:reciever_id};
-	
-	const msg_textarea=await document.getElementById('message_textarea');
-	msg_textarea.value='';
-	const show_message=await document.getElementById('show_message_area');
-	
-	//creating my message dom
-	const my_msg_wraper=document.createElement('div');
-	my_msg_wraper.classList.add('my_message_wraper');
-	const my_msg=document.createElement('div');
-	my_msg.classList.add('my_message');
-	const my_msg_text=document.createElement('div');
-	my_msg_text.classList.add('my_message_text');
-	const my_msg_time=document.createElement('div');
-	my_msg_time.classList.add('my_message_time');
-    
-    //my message dom value;
-    const span_time=document.createElement('span');
-    span_time.innerText=myDate;
-    my_msg_time.append(span_time);
+if(e.charCode===13){
+    const token=localStorage.getItem('x-auth-token');
+	let message=document.createElement('div');
+	message.classList.add('user_msg');
+	let text_msg=document.createElement('div');
+	text_msg.classList.add('text_msg');
+	text_msg.innerText=e.target.value;
+	message.append(text_msg);
 
-    //my message dom text value
+    let msg_box=document.getElementById('show_message_area');
 
-    const p_text=document.createElement('p');
-    p_text.innerText=Typing;
-    my_msg_text.append(p_text);
-
-    my_msg_wraper.append(my_msg);
-    my_msg.append(my_msg_text);
-    my_msg.append(my_msg_time);
-
-    show_message.append(my_msg_wraper)
-    
-    //auto scroll
-	show_message.scrollTop=show_message.scrollHeight;
-    
-    mysocket.emit('send_message',new_message);
-
+    if(msg_box){
+	  msg_box.append(message);
+	  let res=await AxiosConfig.post('/message/add',
+	  	{sender:currentUser.id,reciever:reciever_id,msg:e.target.value},
+	  	{headers:{'x-auth-token':token}})
+	  console.log(res.data)
+    }
+   
+	e.target.value='';
 }
 
 }
-
-//base 64 converter image
 
 
 
@@ -143,33 +84,65 @@ return(
 <div className="chat_area_wraper">
 <div className="chat_area">
 
-<div className="chat_area_nav">
+<div className="chatarea_nav">
 
 {
-recieverinfo.length!==0?
-<div className="chat_area_nav_user">
-<img src={baseURL+'/'+recieverinfo.avatar} alt=""/> 
-<span>{recieverinfo.name}</span> 
-<div className="user_status_online"></div>
-</div>:null    
+loading?
+<div className="chatarea_loading_wraper">loading</div>:
+<div className="chatarea_user">
+<img src={baseURL+'/'+chatinfo.avatar} alt=""/>
+
+<div className="chatarea_user_info">
+<span>{chatinfo.name}</span>
+{
+online?
+<div className="chatuser_online">
+<div></div>
+<span>Online</span>
+</div>:
+<div className="chatuser_offline">
+<div></div>
+<span>Offline</span>
+</div>
+}
+</div> 	
+
+</div>	
 }
 
-<div className="chat_area_nav_icons">
+<div className="chatarea_icon">
 <ul>
-<li><FaPhone/></li>
-<li><BiDotsVerticalRounded/></li>
-<li onClick={e=>history.goBack()}><BiArrowBack/></li>
+<li><BiArrowBack onClick={e=>history.push('/')}/></li>
+<li>
+<HiDotsVertical
+onClick={e=>chataction?setChataction(false):setChataction(true)}
+/>
+</li>
 </ul>
+
+{
+chataction?
+<div className="chatuser_action">
+<li><MdBlock/> <span>Block</span></li>
+<li><MdBlock/> <span>Block</span></li>
+</div>:null	
+}
+
 </div>
 
 </div>
+
 <div className="chat_area_messages" id="show_message_area">
+
 
 
 </div>
 <div className="chat_area_send">
   <div className="send_message">
-   <input id="message_textarea" cols="1" placeholder="type here ..." onChange={e=>setTyping(e.target.value)} onKeyPress={send_message} />
+   <input id="message_textarea" cols="1" placeholder="type here ..." onKeyPress={send_message} />
+   <div className="send_image">
+   <FaImage/>
+   </div>
   </div>
 </div>
 

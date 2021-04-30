@@ -4,18 +4,15 @@ import {BiSearch} from 'react-icons/bi';
 import {Link,useHistory} from 'react-router-dom';
 import Logo from '../images/logo.png';
 import ChatList from '../components/chatlist';
-import {useContext,useEffect,useState} from 'react';
-import AuthContext from '../context/userContext';
-import SocketContext from '../context/socketcontext';
+import {useEffect,useState,useContext} from 'react';
 import AxiosConfig from '../helpers/axiosconfig';
+import AuthContext from '../context/userContext';
 import baseURL from '../helpers/baseurl';
 
 const Home=()=>{
 const history=useHistory();
-const {setCurrentUser}=useContext(AuthContext);
-const {mysocket}=useContext(SocketContext);
 const [Users,setUsers]=useState([]);
-const [screen,setScreen]=useState('Chats');
+const {currentUser}=useContext(AuthContext);
 
 
 //runing initial useEffect
@@ -35,92 +32,15 @@ async function fetch_users(){
 
 fetch_users();
 
-//real time socket.io
-
-if(mysocket===null){
-
-console.log('socket not available')
-
-}else{
-
-mysocket.on('take_message',data=>{
-    console.log(data)
-})
-
-mysocket.on('testing_me',data=>{
-    console.log(data)
-})
-
-}
-
-
-},[mysocket]);
+},[]);
 
 async function logoutHandler(){
     try{
     localStorage.clear();
-    setCurrentUser(null);
+    const token=localStorage.getItem('x-auth-token');
+    await AxiosConfig.post('/remove_socket',{user_id:currentUser.id},{headers:{'x-auth-token':token}})
     history.push('/login');
     }catch(err){console.log('failed to logout')}
-}
-
-async function chat_list(e){
-    try{
-
-    //setting screen
-    const screens=document.querySelectorAll('.chat_user_tabs button');
-    screens.forEach(screen=>{
-        screen.classList.remove('active');
-    });
-    e.target.classList.add('active');
-    const new_screen=e.target.innerHTML;
-    setScreen(new_screen);
-  }catch(err){
-    console.log('failed to get chat list')
-  }
-    
-    
-}
-
-//requests users
-
-async function requests_list(e){
-   
-   try{
-    
-   //seting screen
-   const screens=document.querySelectorAll('.chat_user_tabs button');
-    screens.forEach(screen=>{
-        screen.classList.remove('active');
-    });
-    e.target.classList.add('active');
-    const new_screen=e.target.innerHTML;
-    setScreen(new_screen);
-    }catch(err){
-        console.log('failed to get requests list')
-    }
-
-}
-
-//all users
-
-async function fetch_all_users(e){
-
-   try{
-    
-   //seting screen
-   const screens=document.querySelectorAll('.chat_user_tabs button');
-    screens.forEach(screen=>{
-        screen.classList.remove('active');
-    });
-    e.target.classList.add('active');
-    const new_screen=e.target.innerHTML;
-    setScreen(new_screen);
-
-   }catch(err){
-    console.log('something went wrong')
-   }
-
 }
 
 
@@ -151,15 +71,13 @@ return(
 </div>
 
 <div className="chat_user_tabs">
-<button className="active" onClick={chat_list}>Chats</button>
-<button onClick={requests_list}>Requests</button>
-<button onClick={fetch_all_users}>All Users</button>
+<button className="active">Chats</button>
+<button>Requests</button>
+<button>All Users</button>
 </div>
 
 <div className="chat_users_list">
 
-{
-    screen==='Chats'?
     <div>
     {
     Users.map(user=>{
@@ -168,27 +86,13 @@ return(
             user_id={user._id}
             pic={baseURL+'/'+user.avatar}
             name={user.name}
-            last_active="10 min"
+            status={user.isonline}
             />
 
     })
     }
-   </div>:null
-}
+   </div>
 
-{
-    screen==='Requests'?
-    <div>
-    
-    </div>:null
-}
-
-{
-    screen==='All Users'?
-    <div>
-    
-    </div>:null
-}
 
 </div>
 </div>
