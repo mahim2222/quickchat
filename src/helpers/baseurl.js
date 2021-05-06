@@ -1,3 +1,3 @@
-const baseURL='http://localhost:4000';
+const baseURL='https://mmmquickchat.herokuapp.com';
 
 export default baseURL;
