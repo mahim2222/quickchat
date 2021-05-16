@@ -6,6 +6,8 @@ import {MdBlock} from 'react-icons/md';
 import {useHistory,useParams} from 'react-router-dom';
 import AxiosConfig from '../helpers/axiosconfig';
 import AuthContext from '../context/userContext';
+import Fromme from '../components/fromme';
+import Fromuser from '../components/fromuser';
 import baseURL from '../helpers/baseurl';
 
 const Chat=()=>{
@@ -17,6 +19,9 @@ const [online,setOnline]=useState(false);
 const [chataction,setChataction]=useState(false)
 const { reciever_id } = useParams();
 const {currentUser}=useContext(AuthContext);
+
+//all messages state
+const [Messages,setMessages]=useState([]);
 
 useEffect(()=>{
 localStorage.setItem('msg-reciever',reciever_id);
@@ -38,6 +43,17 @@ setOnline(status.data)
 },10000)
 
 
+//get messages
+
+async function get_chats(){
+
+const chats=await AxiosConfig.post('/message/all',{sender:currentUser.id,reciever:reciever_id})
+setMessages(chats.data)
+console.log(chats.data)
+
+}
+
+get_chats()
 
 
 //cleanup useEffect
@@ -47,7 +63,7 @@ clearInterval(chat_status);
 localStorage.setItem('msg-reciever',null);
 }
 
-},[reciever_id]);
+},[reciever_id,currentUser.id]);
 
 //sending message
 
@@ -134,7 +150,15 @@ chataction?
 
 <div className="chat_area_messages" id="show_message_area">
 
-
+{Messages.map(chat=>{
+return <>
+{
+   chat.sender===currentUser.id?
+   <Fromme key={chat._id} text={chat.text}/>:
+   <Fromuser key={chat._id} text={chat.text}/>	
+}
+</>
+})}
 
 </div>
 <div className="chat_area_send">
