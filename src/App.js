@@ -56,8 +56,17 @@ let msg_box=document.getElementById('show_message_area');
 
 if(msg_box){
   msg_box.append(msg);
+  msg_box.scrollTop=msg_box.scrollHeight;
 }
 
+}else{
+  let blinkable=document.getElementById(message.sender);
+  let cl_list=document.getElementById('swcl');
+  if(blinkable && cl_list){
+  	blinkable.classList.add('msg_notify')
+  	cl_list.prepend(blinkable)
+
+  }
 }
 
 });

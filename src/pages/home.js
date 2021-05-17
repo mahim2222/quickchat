@@ -76,7 +76,7 @@ return(
 <button>All Users</button>
 </div>
 
-<div className="chat_users_list">
+<div className="chat_users_list" id="swcl">
 
     <div>
     {

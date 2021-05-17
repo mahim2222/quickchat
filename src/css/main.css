@@ -198,6 +198,20 @@
 	border-radius: 10px;
 	transition: 0.2s ease-in-out;
 }
+.chat_users.msg_notify{
+	animation: msnotify 500ms infinite;
+}
+
+/*message notify for chat list*/
+@keyframes msnotify {
+	50%{
+       background-color: var(--secondary-bg);
+	}
+	100%{
+       background-color: transparent;
+	}
+}
+
 .chat_users:hover{
 	background-color: var(--secondary-bg);
 	cursor: pointer;
@@ -451,7 +465,7 @@
 	color: #ffffff;
 	font-size: 16px;
 	line-height: 22px;
-	font-family: 'Publis sans',sans-serif;
+	font-family: 'Public sans',sans-serif;
 }
 .sender_msg{
 	width: fit-content;

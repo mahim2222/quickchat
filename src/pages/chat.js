@@ -49,7 +49,8 @@ async function get_chats(){
 
 const chats=await AxiosConfig.post('/message/all',{sender:currentUser.id,reciever:reciever_id})
 setMessages(chats.data)
-console.log(chats.data)
+let sc=document.getElementById("show_message_area")
+sc.scrollTop=sc.scrollHeight
 
 }
 
@@ -83,9 +84,10 @@ if(e.charCode===13){
     if(msg_box){
 	  msg_box.append(message);
 	  let res=await AxiosConfig.post('/message/add',
-	  	{sender:currentUser.id,reciever:reciever_id,msg:e.target.value},
+	  	{sender:currentUser.id,reciever:reciever_id,msg:e.target.value,create_at:Date.now()},
 	  	{headers:{'x-auth-token':token}})
 	  console.log(res.data)
+    msg_box.scrollTop=msg_box.scrollHeight;
     }
    
 	e.target.value='';

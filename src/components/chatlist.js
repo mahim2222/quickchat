@@ -22,7 +22,7 @@ clearInterval(list_status);
 
 return(
 <Link to={'/chat/'+props.user_id}>
-<div className="chat_users">
+<div className="chat_users" id={props.user_id}>
 
 <div className="chat_users_image">
 <img src={props.pic} alt=""/>
