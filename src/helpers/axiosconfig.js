@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL="http://localhost:4000";
+const baseURL="https://condescending-albattani-ffb1e8.netlify.app";
 
 const AxiosConfig=axios.create({
 	baseURL:baseURL
