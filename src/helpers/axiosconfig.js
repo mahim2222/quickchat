@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL="https://condescending-albattani-ffb1e8.netlify.app";
+const baseURL="https://mmmquickchat.herokuapp.com";
 
 const AxiosConfig=axios.create({
 	baseURL:baseURL

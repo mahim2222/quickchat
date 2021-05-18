@@ -1,3 +1,3 @@
-const baseURL='https://condescending-albattani-ffb1e8.netlify.app';
+const baseURL='https://mmmquickchat.herokuapp.com';
 
 export default baseURL;
