@@ -276,6 +276,68 @@
 	margin-left: 10px;
 }
 
+/*chat typing*/
+#typing_wraper{
+	width: 100%;
+	height: auto;
+	padding: 5px;
+	text-align: right;
+	clear: both;
+}
+.chat-bubble {
+   background-color:#E6F8F1;
+   padding:6px 10px;
+   -webkit-border-radius: 20px;
+   -webkit-border-bottom-left-radius: 2px;
+   -moz-border-radius: 20px;
+   -moz-border-radius-bottomleft: 2px;
+   border-radius: 20px;
+   border-bottom-left-radius: 2px;
+   display:inline-block;
+}
+.typing {
+   align-items: center;
+   display: flex;
+   height: 17px;
+}
+.typing .dot {
+   animation: mercuryTypingAnimation 1.8s infinite ease-in-out;
+   background-color: #6CAD96 ;
+   border-radius: 50%;
+   height: 6px;
+   margin-right: 4px;
+   vertical-align: middle;
+   width: 6px;
+   display: inline-block;
+}
+.typing .dot:nth-child(1) {
+   animation-delay: 200ms;
+}
+.typing .dot:nth-child(2) {
+   animation-delay: 300ms;
+}
+.typing .dot:nth-child(3) {
+   animation-delay: 400ms;
+}
+.typing .dot:last-child {
+   margin-right: 0;
+}
+
+@keyframes mercuryTypingAnimation {
+  0% {
+    transform: translateY(0px);
+    background-color:#6CAD96; 
+  }
+  28% {
+    transform: translateY(-7px);
+    background-color:#9ECAB9; 
+  }
+  44% {
+    transform: translateY(0px);
+    background-color: #B5D9CB;
+  }
+}
+
 /*end chat screen css*/
 
 /*chat area design css*/
@@ -446,6 +508,24 @@
 	cursor: pointer;
 }
 
+.msgload_btn{
+	width: 100%;
+	text-align: center;
+	display: block;
+	clear: both;
+}
+.msgload_btn button{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	font-size: 16px;
+	text-transform: capitalize;
+	font-family: "Public sans",sans-serif;
+	color: rgb(114 105 239);
+	cursor: pointer;
+}
+
+
 /*message design css*/
 
 .user_msg{
@@ -459,6 +539,7 @@
 	max-width: 60%;
 	margin: 5px 0px;
 	font-family: "Public sans",sans-serif;
+	position: relative;
 }
 .user_msg .text_msg{
 	padding: 5px;
@@ -466,6 +547,19 @@
 	font-size: 16px;
 	line-height: 22px;
 	font-family: 'Public sans',sans-serif;
+}
+.user_msg #msg_seen{
+	position: absolute;
+	top: 100%;
+	left: 100%;
+	width: fit-content;
+	height: fit-content;
+	cursor: pointer;
+	margin-bottom: 10px;
+}
+.user_msg #msg_seen img{
+	width: 20px;
+	height: 20px;
 }
 .sender_msg{
 	width: fit-content;
