@@ -12,7 +12,6 @@ import AuthContext from './context/userContext';
 import io from 'socket.io-client';
 import baseURL from './helpers/baseurl';
 
-
 function App() {
 
 const [currentUser,setCurrentUser]=useState(null);
