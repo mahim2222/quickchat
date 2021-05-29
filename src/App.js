@@ -56,6 +56,8 @@ text_msg.innerText=message.msg
 msg_el.append(text_msg)
 
 //appending message element
+let typing_anime=document.getElementById('typing_wraper')
+if(typing_anime){typing_anime.remove()}
 msg_box.append(msg_el)
 msg_box.scrollTop=msg_box.scrollHeight;
 
@@ -96,8 +98,15 @@ typing_body.append(typing_inner)
 
 typing_wraper.append(typing_body)
 
-msg_box.lastElementChild.after(typing_wraper)
+let last_el=msg_box.lastElementChild;
+
+if(last_el){
+last_el.after(typing_wraper)
 msg_box.scrollTop=msg_box.scrollHeight;
+}else{
+msg_box.append(typing_wraper)
+}
+
 }
 
 })
